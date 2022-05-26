@@ -28,6 +28,25 @@ app.get("/lifequotes/random", async (req, res) => {
   const [[LifequotesRow]] = await pool.query(`
     SELECT * FROM lifequotes ORDER BY RAND() LIMIT 1
     `);
+  if (LifequotesRow === undefined) {
+    res.status(404).json({
+      resultCode: "F-1",
+      msg: "404 not found",
+    });
+    return;
+  }
+
+  LifequotesRow.hit_Count++;
+
+  await pool.query(
+    `
+    UPDATE lifequotes
+    SET hit_Count = ?
+    WHERE id =?
+    `,
+    [LifequotesRow.hit_Count, LifequotesRow.id]
+  );
+
   res.json({
     resultCode: "S-1",
     msg: "Success!",
