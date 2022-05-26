@@ -24,6 +24,17 @@ app.use(cors(corsOptions));
 
 const port = 3000;
 
+app.get("/lifequotes/random", async (req, res) => {
+  const [[LifequotesRow]] = await pool.query(`
+    SELECT * FROM lifequotes ORDER BY RAND() LIMIT 1
+    `);
+  res.json({
+    resultCode: "S-1",
+    msg: "Success!",
+    data: LifequotesRow,
+  });
+});
+
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Lifequotes app listening on port ${port}`);
 });
