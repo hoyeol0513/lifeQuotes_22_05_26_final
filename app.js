@@ -24,7 +24,9 @@ app.use(cors(corsOptions));
 
 const port = 3000;
 
+//랜덤단건조회 API 구현
 app.get("/lifequotes/random", async (req, res) => {
+  //객체 하나만 받아옴 -> [[]] 사용
   const [[LifequotesRow]] = await pool.query(`
     SELECT * FROM lifequotes ORDER BY RAND() LIMIT 1
     `);
@@ -35,7 +37,8 @@ app.get("/lifequotes/random", async (req, res) => {
     });
     return;
   }
-
+  //1. 조회수를 추가한 뒤에 해당 값을 쿼리에 수정
+  //2. 조회수를 쿼리에 수정한 후 값을 추가하기
   LifequotesRow.hit_Count++;
 
   await pool.query(
@@ -54,6 +57,7 @@ app.get("/lifequotes/random", async (req, res) => {
   });
 });
 
+//수정 API 구현
 app.patch("/lifequotes/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -70,6 +74,9 @@ app.patch("/lifequotes/:id", async (req, res) => {
     });
     return;
   }
+  //기존의 모든 값들을 수정하는 형식
+  //body에 없는 것들은 그대로 다시 데이터에 들어감.
+  //(ex. reg_Date = LifequotesRow.reg_Date)
   const {
     reg_Date = LifequotesRow.reg_Date,
     content = LifequotesRow.content,
